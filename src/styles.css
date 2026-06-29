@@ -126,6 +126,7 @@ body {
   font-size: 18px; font-weight: bold; color: var(--primary-dark);
   background: #fff; border-radius: 18px; padding: 14px; text-align: center;
 }
+.play-title { font-size: 22px; font-weight: bold; color: var(--primary-dark); }
 
 .board-wrap { margin: 10px auto; max-width: 440px; }
 

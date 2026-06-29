@@ -2,6 +2,9 @@ import { useState } from 'react'
 import MeetThePieces from './components/MeetThePieces.jsx'
 import MoveGames from './components/MoveGames.jsx'
 import CaptureGames from './components/CaptureGames.jsx'
+import CheckmateGames from './components/CheckmateGames.jsx'
+import SpecialMoves from './components/SpecialMoves.jsx'
+import PlayGame from './components/PlayGame.jsx'
 import { loadProgress, saveStageComplete, totalStars } from './state/progress.js'
 import { speak, setVoiceEnabled, isVoiceEnabled, sfx } from './audio/speak.js'
 import { PLAYER_NAME } from './config.js'
@@ -14,9 +17,9 @@ const STAGES = [
   { id: 'meet', emoji: '🎭', title: 'Meet the Pieces', ready: true },
   { id: 'move', emoji: '🕹️', title: 'How They Move', ready: true },
   { id: 'capture', emoji: '⚔️', title: 'Capturing', ready: true },
-  { id: 'checkmate', emoji: '👑', title: 'Checkmate!', ready: false },
-  { id: 'special', emoji: '✨', title: 'Special Moves', ready: false },
-  { id: 'play', emoji: '♟️', title: 'Play a Game', ready: false },
+  { id: 'checkmate', emoji: '👑', title: 'Checkmate!', ready: true },
+  { id: 'special', emoji: '✨', title: 'Special Moves', ready: true },
+  { id: 'play', emoji: '♟️', title: 'Play a Game', ready: true },
 ]
 
 export default function App() {
@@ -66,6 +69,28 @@ export default function App() {
         onComplete={() => setProgress(saveStageComplete('capture', 6))}
       />
     )
+  }
+
+  if (screen === 'checkmate') {
+    return (
+      <CheckmateGames
+        onExit={() => setScreen('map')}
+        onComplete={() => setProgress(saveStageComplete('checkmate', 5))}
+      />
+    )
+  }
+
+  if (screen === 'special') {
+    return (
+      <SpecialMoves
+        onExit={() => setScreen('map')}
+        onComplete={() => setProgress(saveStageComplete('special', 3))}
+      />
+    )
+  }
+
+  if (screen === 'play') {
+    return <PlayGame onExit={() => setScreen('map')} />
   }
 
   return (

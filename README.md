@@ -16,14 +16,21 @@ See **[ROADMAP.md](./ROADMAP.md)** for the full product plan and curriculum.
   next one.
 - ⚔️ **Level 3 — Capturing**: knock out enemy pieces by moving onto them. This is
   where the pawn's special diagonal capture is taught.
+- 👑 **Level 4 — Checkmate!**: guided mate-in-one puzzles; the piece that delivers
+  mate glows as a hint. Real checkmate is verified by `chess.js`.
+- ✨ **Level 5 — Special Moves**: promotion (make a Queen!), castling, and en
+  passant — one puzzle each.
+- ♟️ **Level 6 — Play a Game**: a full game against "Leo", a deliberately gentle
+  AI so she can win, gain confidence, and learn from real play.
 - 🎀 **Personalised**: greets the player by name (set `PLAYER_NAME` in
   `src/config.js`).
 - ⭐ Stars, sounds, and a celebration when she finishes each level.
 - 🔊 Voice on/off toggle (the mascot speaks every line — great for pre-readers).
 - 💾 Progress saved on the device.
 
-Later levels (checkmate, special moves, playing the AI) are shown as
-"coming soon" on the map and built in the next phases.
+All six levels of the curriculum are now playable. Every level supports both
+**tapping** (tap a piece, then tap where to go — easiest for little fingers) and
+dragging. Levels 4–6 use the full `chess.js` rules engine.
 
 ## Run it
 
