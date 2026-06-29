@@ -66,18 +66,24 @@ export function reachableSquares(pieceId, square) {
 // FEN characters for white pieces, keyed by our piece ids.
 const FEN_CHAR = { pawn: 'P', rook: 'R', bishop: 'B', knight: 'N', queen: 'Q', king: 'K' }
 
-// Build a board-only FEN with a single white piece on the given square. Used by
-// the movement games, which put one draggable piece on an otherwise empty board.
-export function singlePieceFen(pieceId, square) {
-  const { x, y } = toCoord(square)
+// Build a board-only FEN from a map of square -> FEN char (e.g. {e4:'N', f6:'p'}).
+// White pieces are uppercase, black pieces lowercase. Used to place a small,
+// hand-made position on the board for a puzzle.
+export function buildPositionFen(pieceMap) {
+  const grid = {}
+  for (const [square, char] of Object.entries(pieceMap)) {
+    const { x, y } = toCoord(square)
+    grid[`${x},${y}`] = char
+  }
   const rows = []
   for (let r = 7; r >= 0; r--) {
     let row = ''
     let empty = 0
     for (let f = 0; f < 8; f++) {
-      if (f === x && r === y) {
+      const char = grid[`${f},${r}`]
+      if (char) {
         if (empty) { row += empty; empty = 0 }
-        row += FEN_CHAR[pieceId]
+        row += char
       } else {
         empty++
       }
@@ -86,6 +92,18 @@ export function singlePieceFen(pieceId, square) {
     rows.push(row)
   }
   return rows.join('/') + ' w - - 0 1'
+}
+
+// A board-only FEN with a single white piece (used by the movement games).
+export function singlePieceFen(pieceId, square) {
+  return buildPositionFen({ [square]: FEN_CHAR[pieceId] })
+}
+
+// Squares a piece can CAPTURE onto. Same as its moves for every piece except the
+// pawn, which moves straight forward but captures one square diagonally forward.
+export function captureSquares(pieceId, square) {
+  if (pieceId === 'pawn') return step(square, [[1, 1], [-1, 1]])
+  return reachableSquares(pieceId, square)
 }
 
 // The square the demo piece sits on, read from its FEN (single piece only).

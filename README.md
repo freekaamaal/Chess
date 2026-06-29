@@ -14,11 +14,15 @@ See **[ROADMAP.md](./ROADMAP.md)** for the full product plan and curriculum.
   to eat cookies 🍪. Tapping is built in because it's easiest for little fingers
   on a tablet. Cookies respawn until the piece is mastered, then it's on to the
   next one.
+- ⚔️ **Level 3 — Capturing**: knock out enemy pieces by moving onto them. This is
+  where the pawn's special diagonal capture is taught.
+- 🎀 **Personalised**: greets the player by name (set `PLAYER_NAME` in
+  `src/config.js`).
 - ⭐ Stars, sounds, and a celebration when she finishes each level.
 - 🔊 Voice on/off toggle (the mascot speaks every line — great for pre-readers).
 - 💾 Progress saved on the device.
 
-Later levels (capturing, checkmate, special moves, playing the AI) are shown as
+Later levels (checkmate, special moves, playing the AI) are shown as
 "coming soon" on the map and built in the next phases.
 
 ## Run it

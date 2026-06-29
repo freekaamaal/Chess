@@ -1,42 +1,35 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { Chessboard } from 'react-chessboard'
-import { MOVE_LESSONS } from '../lessons/moveGames.js'
-import { reachableSquares, singlePieceFen } from '../engine/moves.js'
+import { CAPTURE_LESSONS } from '../lessons/captureGames.js'
+import { captureSquares, buildPositionFen } from '../engine/moves.js'
 import { speak, sfx } from '../audio/speak.js'
 import { PLAYER_NAME } from '../config.js'
 import Mascot from './Mascot.jsx'
 
-// A cookie drawn as an SVG emoji so it can sit as a square background.
-const COOKIE_BG =
-  "url(\"data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='100' height='100'><text x='50' y='78' font-size='66' text-anchor='middle'>🍪</text></svg>\")"
+const CHEERS = ['Got it!', 'Knockout!', 'Take that!', 'Bullseye!', 'Captured!']
 
-const YUMS = ['Yum!', 'Nom nom!', 'Delicious!', 'Tasty!', 'Great move!']
-
-// Pick a random square the piece can move to (for the next cookie), avoiding one.
-function pickCookie(pieceId, fromSquare, avoid) {
-  const reach = reachableSquares(pieceId, fromSquare).filter((s) => s !== avoid)
-  return reach[Math.floor(Math.random() * reach.length)]
+// Pick a square the piece can capture onto for the next enemy, avoiding one.
+function pickEnemy(pieceId, fromSquare, avoid) {
+  const targets = captureSquares(pieceId, fromSquare).filter((s) => s !== avoid)
+  return targets[Math.floor(Math.random() * targets.length)]
 }
 
-export default function MoveGames({ onExit, onComplete }) {
+export default function CaptureGames({ onExit, onComplete }) {
   const [index, setIndex] = useState(0)
   const [pieceSquare, setPieceSquare] = useState(null)
-  const [cookie, setCookie] = useState(null)
-  const [eaten, setEaten] = useState(0)
+  const [enemy, setEnemy] = useState(null)
+  const [captured, setCaptured] = useState(0)
   const [stars, setStars] = useState(0)
   const [done, setDone] = useState(false)
-  // Blocks a second move while the board is still animating the first, so an
-  // excited double-tap can't race the board into an error.
   const busy = useRef(false)
 
-  const lesson = MOVE_LESSONS[index]
+  const lesson = CAPTURE_LESSONS[index]
 
-  // (Re)start a piece's game whenever we move to a new piece.
   useEffect(() => {
     busy.current = false
     setPieceSquare(lesson.start)
-    setEaten(0)
-    setCookie(pickCookie(lesson.id, lesson.start, lesson.start))
+    setCaptured(0)
+    setEnemy(pickEnemy(lesson.id, lesson.start, lesson.start))
     speak(lesson.intro)
     sfx.tap()
   }, [index]) // eslint-disable-line react-hooks/exhaustive-deps
@@ -44,62 +37,58 @@ export default function MoveGames({ onExit, onComplete }) {
   const squareStyles = useMemo(() => {
     const styles = {}
     if (pieceSquare) {
-      for (const s of reachableSquares(lesson.id, pieceSquare)) {
-        styles[s] = {
-          background: 'radial-gradient(circle, rgba(124,77,255,0.45) 28%, transparent 30%)',
-        }
+      for (const s of captureSquares(lesson.id, pieceSquare)) {
+        styles[s] = { background: 'radial-gradient(circle, rgba(229,57,53,0.40) 28%, transparent 30%)' }
       }
       styles[pieceSquare] = { boxShadow: 'inset 0 0 0 4px #ffd54f' }
     }
-    if (cookie) {
-      styles[cookie] = {
-        ...(styles[cookie] || {}),
-        backgroundImage: COOKIE_BG,
-        backgroundSize: '78%',
-        backgroundRepeat: 'no-repeat',
-        backgroundPosition: 'center',
-        boxShadow: 'inset 0 0 0 4px #66bb6a',
-      }
+    if (enemy) {
+      styles[enemy] = { ...(styles[enemy] || {}), boxShadow: 'inset 0 0 0 4px #e53935' }
     }
     return styles
-  }, [lesson.id, pieceSquare, cookie])
+  }, [lesson.id, pieceSquare, enemy])
+
+  // White piece + one black "enemy" pawn on the board.
+  const fen = useMemo(() => {
+    if (!pieceSquare) return '8/8/8/8/8/8/8/8 w - - 0 1'
+    const map = { [pieceSquare]: { pawn: 'P', rook: 'R', bishop: 'B', knight: 'N', queen: 'Q', king: 'K' }[lesson.id] }
+    if (enemy) map[enemy] = 'p'
+    return buildPositionFen(map)
+  }, [lesson.id, pieceSquare, enemy])
 
   function finishPiece() {
     sfx.win()
-    const earned = stars + 1
-    setStars(earned)
-    if (index === MOVE_LESSONS.length - 1) {
+    setStars(stars + 1)
+    if (index === CAPTURE_LESSONS.length - 1) {
       setDone(true)
-      speak(`Incredible, ${PLAYER_NAME}! You can move every piece now! You are a chess star!`)
+      speak(`Amazing, ${PLAYER_NAME}! You can capture with every piece! You are a real chess champion!`)
       onComplete?.()
     } else {
-      speak('You ate them all! Next piece!')
+      speak('All enemies down! Next piece!')
       setIndex(index + 1)
     }
   }
 
-  // Shared by both ways to play: dragging the piece (good with a mouse) and
-  // tapping the cookie (easiest for little fingers on a tablet).
   function moveTo(target) {
     if (done || busy.current || !pieceSquare) return false
-    const reachable = reachableSquares(lesson.id, pieceSquare)
-    if (target === cookie && reachable.includes(target)) {
+    const targets = captureSquares(lesson.id, pieceSquare)
+    if (target === enemy && targets.includes(target)) {
       busy.current = true
       setTimeout(() => { busy.current = false }, 220)
-      const newCount = eaten + 1
+      const newCount = captured + 1
       sfx.good()
       if (newCount >= lesson.goal) {
-        setEaten(newCount)
+        setCaptured(newCount)
         finishPiece()
         return true
       }
-      setEaten(newCount)
+      setCaptured(newCount)
       setPieceSquare(target)
-      setCookie(pickCookie(lesson.id, target, target))
-      speak(YUMS[newCount % YUMS.length])
+      setEnemy(pickEnemy(lesson.id, target, target))
+      speak(CHEERS[newCount % CHEERS.length])
       return true
     }
-    speak('Move onto the cookie on a glowing square!')
+    speak('Move onto the enemy to knock it out!')
     return false
   }
 
@@ -111,10 +100,10 @@ export default function MoveGames({ onExit, onComplete }) {
   if (done) {
     return (
       <div className="lesson celebrate">
-        <Mascot speaking message="You can move every piece! 🎉" />
-        <div className="confetti">🍪⭐🏆⭐🍪</div>
-        <h1>Level 2 Complete!</h1>
-        <div className="star-row big">{'⭐'.repeat(MOVE_LESSONS.length)}</div>
+        <Mascot speaking message={`You're a chess champion, ${PLAYER_NAME}! 🏆`} />
+        <div className="confetti">⚔️⭐🏆⭐⚔️</div>
+        <h1>Level 3 Complete!</h1>
+        <div className="star-row big">{'⭐'.repeat(CAPTURE_LESSONS.length)}</div>
         <button className="big-btn" onClick={onExit}>
           Back to Map 🗺️
         </button>
@@ -129,7 +118,7 @@ export default function MoveGames({ onExit, onComplete }) {
           ⬅️
         </button>
         <div className="progress-pips">
-          {MOVE_LESSONS.map((l, i) => (
+          {CAPTURE_LESSONS.map((l, i) => (
             <span key={l.id} className={`pip ${i <= index ? 'on' : ''}`} />
           ))}
         </div>
@@ -143,8 +132,8 @@ export default function MoveGames({ onExit, onComplete }) {
         <div className="piece-name">{lesson.name}</div>
         <div className="cookie-tracker">
           {Array.from({ length: lesson.goal }).map((_, i) => (
-            <span key={i} className={i < eaten ? 'eaten' : ''}>
-              🍪
+            <span key={i} className={i < captured ? 'eaten' : ''}>
+              ⚔️
             </span>
           ))}
         </div>
@@ -152,8 +141,8 @@ export default function MoveGames({ onExit, onComplete }) {
 
       <div className="board-wrap">
         <Chessboard
-          id={`move-${lesson.id}`}
-          position={pieceSquare ? singlePieceFen(lesson.id, pieceSquare) : '8/8/8/8/8/8/8/8 w - - 0 1'}
+          id={`capture-${lesson.id}`}
+          position={fen}
           onPieceDrop={onDrop}
           onSquareClick={moveTo}
           arePiecesDraggable
@@ -169,7 +158,7 @@ export default function MoveGames({ onExit, onComplete }) {
         <button className="speak-btn" onClick={() => speak(lesson.intro)}>
           🔊 Hear again
         </button>
-        <div className="hint-text">Tap or drag the {lesson.name} to the 🍪</div>
+        <div className="hint-text">Capture the enemy ♟️ with your {lesson.name}</div>
       </div>
     </div>
   )

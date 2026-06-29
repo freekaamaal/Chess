@@ -3,6 +3,7 @@ import { Chessboard } from 'react-chessboard'
 import { PIECES } from '../lessons/pieces.js'
 import { reachableSquares, pieceSquareFromFen } from '../engine/moves.js'
 import { speak, sfx } from '../audio/speak.js'
+import { PLAYER_NAME } from '../config.js'
 import Mascot from './Mascot.jsx'
 
 // Stage 0: meet each piece as a character, hear it talk, and watch the squares
@@ -44,7 +45,7 @@ export default function MeetThePieces({ onExit, onComplete }) {
     if (index === PIECES.length - 1) {
       setDone(true)
       sfx.win()
-      speak("Wow! You met all the pieces! You are amazing!")
+      speak(`Wow ${PLAYER_NAME}! You met all the pieces! You are amazing!`)
       onComplete?.()
     } else {
       setIndex(index + 1)

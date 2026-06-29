@@ -1,8 +1,10 @@
 import { useState } from 'react'
 import MeetThePieces from './components/MeetThePieces.jsx'
 import MoveGames from './components/MoveGames.jsx'
+import CaptureGames from './components/CaptureGames.jsx'
 import { loadProgress, saveStageComplete, totalStars } from './state/progress.js'
 import { speak, setVoiceEnabled, isVoiceEnabled, sfx } from './audio/speak.js'
+import { PLAYER_NAME } from './config.js'
 
 // The "world map" — a row of stages the child travels through. Stage 0 is
 // playable now; later stages are shown as locked/coming-soon so the path is
@@ -11,7 +13,7 @@ import { speak, setVoiceEnabled, isVoiceEnabled, sfx } from './audio/speak.js'
 const STAGES = [
   { id: 'meet', emoji: '🎭', title: 'Meet the Pieces', ready: true },
   { id: 'move', emoji: '🕹️', title: 'How They Move', ready: true },
-  { id: 'capture', emoji: '🍪', title: 'Capturing', ready: false },
+  { id: 'capture', emoji: '⚔️', title: 'Capturing', ready: true },
   { id: 'checkmate', emoji: '👑', title: 'Checkmate!', ready: false },
   { id: 'special', emoji: '✨', title: 'Special Moves', ready: false },
   { id: 'play', emoji: '♟️', title: 'Play a Game', ready: false },
@@ -57,10 +59,19 @@ export default function App() {
     )
   }
 
+  if (screen === 'capture') {
+    return (
+      <CaptureGames
+        onExit={() => setScreen('map')}
+        onComplete={() => setProgress(saveStageComplete('capture', 6))}
+      />
+    )
+  }
+
   return (
     <div className="map">
       <header className="map-header">
-        <h1>Chess for Kids 🦁</h1>
+        <h1>{PLAYER_NAME}'s Chess 🦁</h1>
         <div className="header-right">
           <span className="total-stars">⭐ {totalStars(progress)}</span>
           <button className="icon-btn" onClick={toggleVoice} aria-label="Toggle voice">
@@ -69,7 +80,7 @@ export default function App() {
         </div>
       </header>
 
-      <p className="tagline">Tap an adventure to start!</p>
+      <p className="tagline">Hi {PLAYER_NAME}! Tap an adventure to start! 👇</p>
 
       <div className="stage-grid">
         {STAGES.map((stage, i) => {
