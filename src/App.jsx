@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import MeetThePieces from './components/MeetThePieces.jsx'
+import MoveGames from './components/MoveGames.jsx'
 import { loadProgress, saveStageComplete, totalStars } from './state/progress.js'
 import { speak, setVoiceEnabled, isVoiceEnabled, sfx } from './audio/speak.js'
 
@@ -9,7 +10,7 @@ import { speak, setVoiceEnabled, isVoiceEnabled, sfx } from './audio/speak.js'
 
 const STAGES = [
   { id: 'meet', emoji: '🎭', title: 'Meet the Pieces', ready: true },
-  { id: 'move', emoji: '🕹️', title: 'How They Move', ready: false },
+  { id: 'move', emoji: '🕹️', title: 'How They Move', ready: true },
   { id: 'capture', emoji: '🍪', title: 'Capturing', ready: false },
   { id: 'checkmate', emoji: '👑', title: 'Checkmate!', ready: false },
   { id: 'special', emoji: '✨', title: 'Special Moves', ready: false },
@@ -43,6 +44,15 @@ export default function App() {
       <MeetThePieces
         onExit={() => setScreen('map')}
         onComplete={() => setProgress(saveStageComplete('meet', 6))}
+      />
+    )
+  }
+
+  if (screen === 'move') {
+    return (
+      <MoveGames
+        onExit={() => setScreen('map')}
+        onComplete={() => setProgress(saveStageComplete('move', 6))}
       />
     )
   }

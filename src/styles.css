@@ -118,6 +118,14 @@ body {
 .piece-emoji { font-size: 64px; }
 .piece-name { font-size: 28px; font-weight: bold; }
 .piece-title { font-size: 16px; opacity: 0.95; }
+.cookie-tracker { font-size: 26px; margin-top: 4px; letter-spacing: 2px; }
+.cookie-tracker span { opacity: 0.35; filter: grayscale(0.7); transition: all 0.2s ease; }
+.cookie-tracker span.eaten { opacity: 1; filter: none; transform: scale(1.1); }
+.hint-text {
+  flex: 2; display: flex; align-items: center; justify-content: center;
+  font-size: 18px; font-weight: bold; color: var(--primary-dark);
+  background: #fff; border-radius: 18px; padding: 14px; text-align: center;
+}
 
 .board-wrap { margin: 10px auto; max-width: 440px; }
 
