@@ -52,19 +52,31 @@ export function chooseMove(chess, difficulty = 'easy') {
     return pick(moves)
   }
 
-  // hard: one-move-ahead greedy on material, with a little randomness among ties.
+  // hard: look two plies ahead (Black's move + White's best reply) so Leo
+  // recaptures, avoids hanging pieces, and spots simple threats.
   let best = -Infinity
   let bestMoves = []
   for (const m of moves) {
     chess.move(m)
-    const score = materialForBlack(chess)
+    const score = minimax(chess, 1, false) // White to move next, minimising Black's score
     chess.undo()
-    if (score > best) {
-      best = score
-      bestMoves = [m]
-    } else if (score === best) {
-      bestMoves.push(m)
-    }
+    if (score > best) { best = score; bestMoves = [m] }
+    else if (score === best) bestMoves.push(m)
   }
   return pick(bestMoves)
+}
+
+// Tiny minimax on material. isBlack = is it Black's turn at this node.
+function minimax(chess, depth, isBlack) {
+  if (chess.isCheckmate()) return isBlack ? -100000 : 100000 // side to move is mated
+  if (depth === 0 || chess.isGameOver()) return materialForBlack(chess)
+  const moves = chess.moves({ verbose: true })
+  let best = isBlack ? -Infinity : Infinity
+  for (const m of moves) {
+    chess.move(m)
+    const v = minimax(chess, depth - 1, !isBlack)
+    chess.undo()
+    best = isBlack ? Math.max(best, v) : Math.min(best, v)
+  }
+  return best
 }

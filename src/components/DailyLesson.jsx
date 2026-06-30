@@ -1,5 +1,5 @@
 import { useRef, useState } from 'react'
-import { PLAN, PLAN_LENGTH, puzzlesByIds } from '../lessons/plan.js'
+import { PLAN, PLAN_LENGTH, resolvePuzzles } from '../lessons/plan.js'
 import { loadCoach, completeDailyLesson, getMascot } from '../state/coach.js'
 import { speak, sfx } from '../audio/speak.js'
 import { PLAYER_NAME } from '../config.js'
@@ -76,7 +76,7 @@ export default function DailyLesson({ onExit, onDone }) {
   if (activity.kind === 'puzzles') {
     return (
       <PuzzlePlayer
-        puzzles={puzzlesByIds(activity.ids)}
+        puzzles={resolvePuzzles(activity, plan.day)}
         title={`Day ${plan.day}`}
         onExit={onExit}
         onComplete={finishWithCelebration}

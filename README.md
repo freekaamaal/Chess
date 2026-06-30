@@ -39,22 +39,32 @@ dragging. Levels 4–6 use the full `chess.js` rules engine.
   Profiles, passwords and avatars live in `src/state/profiles.js`.
   *(This is a friendly on-device login for accountability, not secure cloud
   auth — each child's progress is saved on the device she uses.)*
-- 🗓️ **20-Day Journey** (`src/lessons/plan.js`): one short lesson per day that
-  gets gradually harder (pieces → capturing → checkmate → tactics → real games).
-  The app allows **one journey day per calendar day**, so the habit is real.
+- 🗓️ **30-Day Journey** (`src/lessons/plan.js`): one short lesson per day that
+  gets gradually harder (pieces → capturing → checkmate → tactics → real games →
+  forks & combinations → tough games). The app allows **one journey day per
+  calendar day**, so the habit is real, and it carries a full month.
 - 📊 **Journey tracker** ("My Plan"): every day with a ✅ and the date it was
   completed — the parent's accountability view — plus current/locked days.
 
 ### Tactics Trainer & adaptive difficulty 🎯
 
-- A themed puzzle bank (`src/lessons/tactics.js`) — win-a-piece, win-the-queen,
-  checkmate-in-one, two-rook mates, and **knight forks** — tagged by theme and a
-  1–3 difficulty level. Puzzle types are verified by `chess.js` (capture made,
-  real checkmate, or the exact best move).
+- A **bank of 60+ puzzles** in `src/lessons/tacticsData.js`, auto-generated and
+  **verified by chess.js** via `scripts/genTactics.mjs` (re-run it to grow the
+  bank). Themes: win-a-piece, win-a-rook, win-the-queen, checkmate-in-one,
+  two-rook mates, and **knight forks**, each tagged with a 1–3 difficulty level.
 - **Tactics Trainer** (under Practice): endless rounds of 5 puzzles chosen near
   the child's tactics rating. The rating rises on first-try solves and eases off
   when she struggles, so the puzzles get **harder as she improves** (shown as
   Beginner → Improver → Sharp → Star in the Trophy Room).
+- **Three AI levels** for "Leo": easy (mostly random), medium (takes free
+  material), and hard (looks two moves ahead — recaptures and avoids hanging
+  pieces).
+
+### Regenerating the puzzle bank
+
+```bash
+node scripts/genTactics.mjs   # writes src/lessons/tacticsData.js (all verified)
+```
 
 ### The Daily Coach 🦁
 
