@@ -32,6 +32,19 @@ All six levels of the curriculum are now playable. Every level supports both
 **tapping** (tap a piece, then tap where to go — easiest for little fingers) and
 dragging. Levels 4–6 use the full `chess.js` rules engine.
 
+### Kid accounts & the 20-Day Journey 🚀
+
+- 👧 **Two child profiles** (Navya & Aadhya) with fun, easy passwords. Each girl
+  taps her name, types her secret word, and gets her **own** saved progress.
+  Profiles, passwords and avatars live in `src/state/profiles.js`.
+  *(This is a friendly on-device login for accountability, not secure cloud
+  auth — each child's progress is saved on the device she uses.)*
+- 🗓️ **20-Day Journey** (`src/lessons/plan.js`): one short lesson per day that
+  gets gradually harder (pieces → capturing → checkmate → tactics → real games).
+  The app allows **one journey day per calendar day**, so the habit is real.
+- 📊 **Journey tracker** ("My Plan"): every day with a ✅ and the date it was
+  completed — the parent's accountability view — plus current/locked days.
+
 ### The Daily Coach 🦁
 
 The app opens as a **daily coach**, not just a menu:

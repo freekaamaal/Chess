@@ -10,11 +10,13 @@ import DailyLesson from './components/DailyLesson.jsx'
 import TrophyRoom from './components/TrophyRoom.jsx'
 import Settings from './components/Settings.jsx'
 import TimeUp from './components/TimeUp.jsx'
+import Login from './components/Login.jsx'
+import PlanProgress from './components/PlanProgress.jsx'
 import { loadProgress, saveStageComplete } from './state/progress.js'
 import { addSeconds, secondsLeftToday, getSettings } from './state/coach.js'
+import { getActiveProfile } from './state/profiles.js'
 import { setVoiceEnabled, sfx } from './audio/speak.js'
 
-// The 6-level "Practice" curriculum (always available from the home screen).
 const STAGES = [
   { id: 'meet', emoji: '🎭', title: 'Meet the Pieces' },
   { id: 'move', emoji: '🕹️', title: 'How They Move' },
@@ -24,22 +26,24 @@ const STAGES = [
   { id: 'play', emoji: '♟️', title: 'Play a Game' },
 ]
 
-// Screens that count toward the daily play-time budget.
 const ACTIVITY = new Set(['daily', 'meet', 'move', 'capture', 'checkmate', 'special', 'play'])
 
 export default function App() {
+  const [profile, setProfile] = useState(getActiveProfile)
   const [screen, setScreen] = useState('home')
-  const [progress, setProgress] = useState(loadProgress)
+  const [progress, setProgress] = useState({ completed: {}, stars: {} })
   const tick = useRef(null)
 
-  // Apply the saved voice preference once at startup.
+  // Load the logged-in child's voice preference and progress.
   useEffect(() => {
+    if (!profile) return
     setVoiceEnabled(getSettings().voice !== false)
-  }, [])
+    setProgress(loadProgress())
+  }, [profile])
 
   // Count practice time while in an activity; end the day when the budget runs out.
   useEffect(() => {
-    if (!ACTIVITY.has(screen)) return
+    if (!profile || !ACTIVITY.has(screen)) return
     tick.current = setInterval(() => {
       addSeconds(1)
       if (secondsLeftToday() <= 0) {
@@ -48,7 +52,7 @@ export default function App() {
       }
     }, 1000)
     return () => clearInterval(tick.current)
-  }, [screen])
+  }, [screen, profile])
 
   function openActivity(target) {
     if (secondsLeftToday() <= 0) {
@@ -65,23 +69,31 @@ export default function App() {
     setScreen('home')
   }
 
+  // --- Login gate ---
+  if (!profile) {
+    return <Login onLogin={(p) => { setProfile(p); setScreen('home') }} />
+  }
+
   // --- Activity screens ---
   if (screen === 'daily') return <DailyLesson onExit={backHome} onDone={() => setProgress(loadProgress())} />
-  if (screen === 'meet')
-    return <MeetThePieces onExit={backHome} onComplete={() => saveStageComplete('meet', 6)} />
-  if (screen === 'move')
-    return <MoveGames onExit={backHome} onComplete={() => saveStageComplete('move', 6)} />
-  if (screen === 'capture')
-    return <CaptureGames onExit={backHome} onComplete={() => saveStageComplete('capture', 6)} />
-  if (screen === 'checkmate')
-    return <CheckmateGames onExit={backHome} onComplete={() => saveStageComplete('checkmate', 5)} />
-  if (screen === 'special')
-    return <SpecialMoves onExit={backHome} onComplete={() => saveStageComplete('special', 3)} />
+  if (screen === 'meet') return <MeetThePieces onExit={backHome} onComplete={() => saveStageComplete('meet', 6)} />
+  if (screen === 'move') return <MoveGames onExit={backHome} onComplete={() => saveStageComplete('move', 6)} />
+  if (screen === 'capture') return <CaptureGames onExit={backHome} onComplete={() => saveStageComplete('capture', 6)} />
+  if (screen === 'checkmate') return <CheckmateGames onExit={backHome} onComplete={() => saveStageComplete('checkmate', 5)} />
+  if (screen === 'special') return <SpecialMoves onExit={backHome} onComplete={() => saveStageComplete('special', 3)} />
   if (screen === 'play') return <PlayGame onExit={backHome} />
 
   // --- Non-activity screens ---
   if (screen === 'trophy') return <TrophyRoom onExit={backHome} />
-  if (screen === 'settings') return <Settings onExit={backHome} onChange={() => setProgress(loadProgress())} />
+  if (screen === 'plan') return <PlanProgress onExit={backHome} />
+  if (screen === 'settings')
+    return (
+      <Settings
+        onExit={backHome}
+        onChange={() => setProgress(loadProgress())}
+        onLogout={() => { setProfile(null); setScreen('home') }}
+      />
+    )
   if (screen === 'timeup') return <TimeUp onExit={backHome} />
 
   if (screen === 'practice') {
@@ -114,6 +126,7 @@ export default function App() {
   return (
     <CoachHome
       onStartLesson={() => openActivity('daily')}
+      onPlan={() => setScreen('plan')}
       onPractice={() => setScreen('practice')}
       onTrophy={() => setScreen('trophy')}
       onSettings={() => setScreen('settings')}

@@ -1,11 +1,11 @@
-// Progress is saved on the device (localStorage) so there's no login for v1.
-// Stores which stages are complete and how many stars were earned.
+// Per-child practice progress (which Practice levels are complete + stars).
+import { keyFor } from './profiles.js'
 
-const KEY = 'chess-for-kids-progress-v1'
+const KEY = () => keyFor('chess-progress-v1')
 
 export function loadProgress() {
   try {
-    return JSON.parse(localStorage.getItem(KEY)) || { completed: {}, stars: {} }
+    return JSON.parse(localStorage.getItem(KEY())) || { completed: {}, stars: {} }
   } catch {
     return { completed: {}, stars: {} }
   }
@@ -15,7 +15,7 @@ export function saveStageComplete(stageId, stars) {
   const p = loadProgress()
   p.completed[stageId] = true
   p.stars[stageId] = Math.max(p.stars[stageId] || 0, stars)
-  localStorage.setItem(KEY, JSON.stringify(p))
+  localStorage.setItem(KEY(), JSON.stringify(p))
   return p
 }
 

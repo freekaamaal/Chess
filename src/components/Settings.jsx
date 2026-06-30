@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { MASCOTS, getSettings, setSetting } from '../state/coach.js'
+import { logout, getActiveProfile } from '../state/profiles.js'
 import { speak, setVoiceEnabled } from '../audio/speak.js'
 
 const DIFFICULTIES = [
@@ -9,8 +10,9 @@ const DIFFICULTIES = [
 ]
 const LIMITS = [10, 15, 20, 30, 0] // 0 = no limit
 
-export default function Settings({ onExit, onChange }) {
+export default function Settings({ onExit, onChange, onLogout }) {
   const [settings, setSettings] = useState(getSettings())
+  const profile = getActiveProfile()
 
   function update(key, value) {
     const s = setSetting(key, value)
@@ -64,6 +66,11 @@ export default function Settings({ onExit, onChange }) {
         <button className={`opt-btn ${settings.voice !== false ? 'on' : ''}`} onClick={() => { update('voice', true); setVoiceEnabled(true); speak('Voice on!') }}>🔊 On</button>
         <button className={`opt-btn ${settings.voice === false ? 'on' : ''}`} onClick={() => { update('voice', false); setVoiceEnabled(false) }}>🔇 Off</button>
       </div>
+
+      <h2 className="section-title">Account</h2>
+      <button className="big-btn" style={{ background: '#ef6c00', boxShadow: '0 6px 0 #b35200' }} onClick={() => { logout(); onLogout?.() }}>
+        {profile ? `Log out ${profile.name} 👋` : 'Log out 👋'}
+      </button>
     </div>
   )
 }

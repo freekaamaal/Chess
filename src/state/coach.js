@@ -2,7 +2,10 @@
 // difficulty, daily limit), and badge tracking. Everything is stored on the
 // device so the coach remembers Navya day to day with no login.
 
-const KEY = 'chess-coach-v1'
+import { keyFor } from './profiles.js'
+import { PLAN_LENGTH } from '../lessons/plan.js'
+
+const KEY = () => keyFor('chess-coach-v1') // per-profile storage
 
 const DEFAULTS = {
   streak: 0,
@@ -10,6 +13,8 @@ const DEFAULTS = {
   daysPracticed: 0,
   lastLessonDate: null, // YYYY-MM-DD of the last completed daily lesson
   totalLessons: 0,
+  planDay: 0, // number of journey days completed (0..PLAN_LENGTH)
+  completedDays: [], // [{ day, date }] for the parent's progress tracker
   today: { date: null, secondsSpent: 0, lessonDone: false },
   settings: { mascot: 'lion', difficulty: 'easy', dailyLimitMin: 15, voice: true },
 }
@@ -33,7 +38,7 @@ function yesterdayStr() {
 
 function readRaw() {
   try {
-    return { ...DEFAULTS, ...JSON.parse(localStorage.getItem(KEY)) }
+    return { ...DEFAULTS, ...JSON.parse(localStorage.getItem(KEY())) }
   } catch {
     return { ...DEFAULTS }
   }
@@ -51,7 +56,7 @@ export function loadCoach() {
 }
 
 function save(s) {
-  localStorage.setItem(KEY, JSON.stringify(s))
+  localStorage.setItem(KEY(), JSON.stringify(s))
 }
 
 export function getMascot() {
@@ -83,17 +88,23 @@ export function secondsLeftToday(s = loadCoach()) {
   return Math.max(0, limit - s.today.secondsSpent)
 }
 
-// Called when she finishes the daily lesson: advances the streak (or resets it
-// if she missed a day) and records the practice day. No double-count per day.
+// Called when she finishes the day's lesson. Enforces ONE journey day per
+// calendar day, advances the streak (or resets it if a day was missed), and
+// records the date each day was completed for the parent's tracker.
 export function completeDailyLesson() {
   const s = loadCoach()
+  if (s.today.lessonDone) return s // already done today — no double advance
   const today = todayStr()
-  if (s.lastLessonDate !== today) {
-    s.streak = s.lastLessonDate === yesterdayStr() ? s.streak + 1 : 1
-    s.longestStreak = Math.max(s.longestStreak, s.streak)
-    s.daysPracticed += 1
-    s.lastLessonDate = today
-  }
+
+  s.streak = s.lastLessonDate === yesterdayStr() ? s.streak + 1 : 1
+  s.longestStreak = Math.max(s.longestStreak, s.streak)
+  s.daysPracticed += 1
+  s.lastLessonDate = today
+
+  const justDid = (s.planDay || 0) + 1 // 1-based day number completed
+  s.planDay = Math.min((s.planDay || 0) + 1, PLAN_LENGTH)
+  s.completedDays = [...(s.completedDays || []), { day: justDid, date: today }]
+
   s.today.lessonDone = true
   s.totalLessons += 1
   save(s)

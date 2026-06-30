@@ -9,7 +9,7 @@ import Mascot from './Mascot.jsx'
 
 const START = 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1'
 
-export default function PlayGame({ onExit }) {
+export default function PlayGame({ onExit, onGameEnd }) {
   const chessRef = useRef(new Chess())
   const coach = getMascot()
   const difficulty = getSettings().difficulty
@@ -38,6 +38,7 @@ export default function PlayGame({ onExit }) {
     if (chess.isCheckmate()) {
       const playerWon = chess.turn() === 'b' // side to move is checkmated
       setOver(true)
+      onGameEnd?.()
       if (playerWon) {
         sfx.win()
         setMessage(`Checkmate! You win, ${PLAYER_NAME}! 🏆`)
@@ -50,6 +51,7 @@ export default function PlayGame({ onExit }) {
     }
     if (chess.isDraw() || chess.isStalemate()) {
       setOver(true)
+      onGameEnd?.()
       setMessage("It's a tie! Nobody wins. Good game! 🤝")
       speak("It's a tie! Great game!")
       return true
