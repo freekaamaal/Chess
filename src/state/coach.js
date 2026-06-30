@@ -15,6 +15,7 @@ const DEFAULTS = {
   totalLessons: 0,
   planDay: 0, // number of journey days completed (0..PLAN_LENGTH)
   completedDays: [], // [{ day, date }] for the parent's progress tracker
+  puzzleRating: 1, // adaptive tactics level (1..3), rises as she solves faster
   today: { date: null, secondsSpent: 0, lessonDone: false },
   settings: { mascot: 'lion', difficulty: 'easy', dailyLimitMin: 15, voice: true },
 }
@@ -86,6 +87,22 @@ export function secondsLeftToday(s = loadCoach()) {
   const limit = s.settings.dailyLimitMin * 60
   if (!limit) return Infinity // 0 minutes means "no limit"
   return Math.max(0, limit - s.today.secondsSpent)
+}
+
+export const RATING_LABELS = ['Beginner', 'Improver', 'Sharp', 'Star']
+export function ratingLabel(r = getPuzzleRating()) {
+  return RATING_LABELS[Math.max(0, Math.min(3, Math.round(r) - 1))]
+}
+export function getPuzzleRating() {
+  return loadCoach().puzzleRating || 1
+}
+// Nudge the tactics rating up on a first-try solve, down if it took retries.
+export function updatePuzzleRating(firstTry) {
+  const s = loadCoach()
+  let r = (s.puzzleRating || 1) + (firstTry ? 0.18 : -0.12)
+  s.puzzleRating = Math.max(1, Math.min(3, r))
+  save(s)
+  return s.puzzleRating
 }
 
 // Called when she finishes the day's lesson. Enforces ONE journey day per

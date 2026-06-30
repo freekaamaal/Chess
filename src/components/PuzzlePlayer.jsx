@@ -6,11 +6,12 @@ import Mascot from './Mascot.jsx'
 
 // Plays an ordered list of tactic puzzles one at a time (the "legs"), showing a
 // Step X of N bar. Calls onComplete() once every puzzle is solved.
-export default function PuzzlePlayer({ puzzles, title = 'Puzzle', onExit, onComplete }) {
+export default function PuzzlePlayer({ puzzles, title = 'Puzzle', onExit, onComplete, onResult }) {
   const [index, setIndex] = useState(0)
   const [position, setPosition] = useState(puzzles[0].fen)
   const chessRef = useRef(new Chess(puzzles[0].fen))
   const busy = useRef(false)
+  const tries = useRef(0)
 
   const puzzle = puzzles[index]
 
@@ -18,6 +19,7 @@ export default function PuzzlePlayer({ puzzles, title = 'Puzzle', onExit, onComp
     chessRef.current = new Chess(puzzle.fen)
     setPosition(puzzle.fen)
     busy.current = false
+    tries.current = 0
     speak(puzzle.hint)
     sfx.tap()
   }, [index]) // eslint-disable-line react-hooks/exhaustive-deps
@@ -40,6 +42,7 @@ export default function PuzzlePlayer({ puzzles, title = 'Puzzle', onExit, onComp
   function solved(move) {
     if (puzzle.type === 'mate') return chess.isCheckmate()
     if (puzzle.type === 'capture') return !!move.captured
+    if (puzzle.type === 'solution') return move.from === puzzle.from && move.to === puzzle.to
     return false
   }
 
@@ -62,11 +65,13 @@ export default function PuzzlePlayer({ puzzles, title = 'Puzzle', onExit, onComp
     setPosition(chess.fen())
     if (solved(move)) {
       busy.current = true
+      onResult?.({ id: puzzle.id, level: puzzle.level || 1, firstTry: tries.current === 0 })
       sfx.win()
-      speak(puzzle.type === 'mate' ? 'Checkmate! Brilliant!' : 'Great capture!')
+      speak(puzzle.type === 'mate' ? 'Checkmate! Brilliant!' : 'Great move!')
       setTimeout(advance, 1100)
       return true
     }
+    tries.current += 1
     busy.current = true
     speak('Not quite! Try again.')
     setTimeout(() => {

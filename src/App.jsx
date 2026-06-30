@@ -12,6 +12,7 @@ import Settings from './components/Settings.jsx'
 import TimeUp from './components/TimeUp.jsx'
 import Login from './components/Login.jsx'
 import PlanProgress from './components/PlanProgress.jsx'
+import TacticsTrainer from './components/TacticsTrainer.jsx'
 import { loadProgress, saveStageComplete } from './state/progress.js'
 import { addSeconds, secondsLeftToday, getSettings } from './state/coach.js'
 import { getActiveProfile } from './state/profiles.js'
@@ -26,7 +27,7 @@ const STAGES = [
   { id: 'play', emoji: '♟️', title: 'Play a Game' },
 ]
 
-const ACTIVITY = new Set(['daily', 'meet', 'move', 'capture', 'checkmate', 'special', 'play'])
+const ACTIVITY = new Set(['daily', 'meet', 'move', 'capture', 'checkmate', 'special', 'play', 'tactics'])
 
 export default function App() {
   const [profile, setProfile] = useState(getActiveProfile)
@@ -82,6 +83,7 @@ export default function App() {
   if (screen === 'checkmate') return <CheckmateGames onExit={backHome} onComplete={() => saveStageComplete('checkmate', 5)} />
   if (screen === 'special') return <SpecialMoves onExit={backHome} onComplete={() => saveStageComplete('special', 3)} />
   if (screen === 'play') return <PlayGame onExit={backHome} />
+  if (screen === 'tactics') return <TacticsTrainer onExit={backHome} />
 
   // --- Non-activity screens ---
   if (screen === 'trophy') return <TrophyRoom onExit={backHome} />
@@ -105,6 +107,9 @@ export default function App() {
           <span style={{ width: 48 }} />
         </div>
         <p className="tagline">Tap a level to learn and play!</p>
+        <button className="big-btn trainer-btn" onClick={() => openActivity('tactics')}>
+          🎯 Tactics Trainer — puzzles that grow with you
+        </button>
         <div className="stage-grid">
           {STAGES.map((stage, i) => {
             const done = progress.completed[stage.id]

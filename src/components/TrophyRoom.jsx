@@ -1,6 +1,6 @@
-import { loadCoach } from '../state/coach.js'
+import { loadCoach, ratingLabel } from '../state/coach.js'
 import { loadProgress, totalStars } from '../state/progress.js'
-import { PLAYER_NAME } from '../config.js'
+import { getActiveProfile } from '../state/profiles.js'
 
 // Navya's progress at a glance: streak, days, stars, and the badges she's won.
 export default function TrophyRoom({ onExit }) {
@@ -8,6 +8,7 @@ export default function TrophyRoom({ onExit }) {
   const progress = loadProgress()
   const stars = totalStars(progress)
   const c = progress.completed
+  const name = getActiveProfile()?.name || 'My'
 
   const badges = [
     { emoji: '🌟', label: 'First Lesson', earned: coach.totalLessons >= 1 },
@@ -26,7 +27,7 @@ export default function TrophyRoom({ onExit }) {
     <div className="map">
       <div className="lesson-top">
         <button className="back-btn" onClick={onExit} aria-label="Back">⬅️</button>
-        <h1 style={{ margin: 0, fontSize: 26 }}>{PLAYER_NAME}'s Trophies 🏆</h1>
+        <h1 style={{ margin: 0, fontSize: 26 }}>{name}'s Trophies 🏆</h1>
         <span style={{ width: 48 }} />
       </div>
 
@@ -34,7 +35,7 @@ export default function TrophyRoom({ onExit }) {
         <div className="stat-box"><div className="stat-num">🔥 {coach.streak}</div><div className="stat-label">Day Streak</div></div>
         <div className="stat-box"><div className="stat-num">📅 {coach.daysPracticed}</div><div className="stat-label">Days Played</div></div>
         <div className="stat-box"><div className="stat-num">⭐ {stars}</div><div className="stat-label">Stars</div></div>
-        <div className="stat-box"><div className="stat-num">🏅 {coach.longestStreak}</div><div className="stat-label">Best Streak</div></div>
+        <div className="stat-box"><div className="stat-num">🎯 {ratingLabel(coach.puzzleRating)}</div><div className="stat-label">Tactics</div></div>
       </div>
 
       <h2 className="section-title">Badges ({earnedCount}/{badges.length})</h2>

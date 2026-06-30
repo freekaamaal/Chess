@@ -45,6 +45,17 @@ dragging. Levels 4–6 use the full `chess.js` rules engine.
 - 📊 **Journey tracker** ("My Plan"): every day with a ✅ and the date it was
   completed — the parent's accountability view — plus current/locked days.
 
+### Tactics Trainer & adaptive difficulty 🎯
+
+- A themed puzzle bank (`src/lessons/tactics.js`) — win-a-piece, win-the-queen,
+  checkmate-in-one, two-rook mates, and **knight forks** — tagged by theme and a
+  1–3 difficulty level. Puzzle types are verified by `chess.js` (capture made,
+  real checkmate, or the exact best move).
+- **Tactics Trainer** (under Practice): endless rounds of 5 puzzles chosen near
+  the child's tactics rating. The rating rises on first-try solves and eases off
+  when she struggles, so the puzzles get **harder as she improves** (shown as
+  Beginner → Improver → Sharp → Star in the Trophy Room).
+
 ### The Daily Coach 🦁
 
 The app opens as a **daily coach**, not just a menu:

@@ -32,7 +32,7 @@ export const PLAN = [
   { day: 16, title: 'Tactics Review', focus: 'Captures + mates', activity: { kind: 'puzzles', ids: ['cap-bishop2', 'mate-rook', 'cap-queen2', 'mate-2rook'] } },
   { day: 17, title: 'Checkmate Mastery', focus: 'All the mates', activity: { kind: 'puzzles', ids: ['mate-rook', 'mate-queen', 'mate-qk', 'mate-2rook'] } },
   { day: 18, title: 'Play a Game', focus: 'Medium Leo', activity: { kind: 'play', difficulty: 'medium' } },
-  { day: 19, title: 'Grand Tactics', focus: 'Everything together', activity: { kind: 'puzzles', ids: ['cap-queen', 'mate-2rook', 'cap-knight2', 'mate-qk'] } },
+  { day: 19, title: 'Knight Forks!', focus: 'Forks + mates', activity: { kind: 'puzzles', ids: ['fork-1', 'cap-bigq', 'fork-2', 'mate-2rook'] } },
   { day: 20, title: 'Championship! 🏆', focus: 'Beat the toughest Leo', activity: { kind: 'play', difficulty: 'hard' } },
 ]
 
