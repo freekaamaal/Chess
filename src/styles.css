@@ -128,6 +128,63 @@ body {
 }
 .play-title { font-size: 22px; font-weight: bold; color: var(--primary-dark); }
 
+/* ---------- Daily coach home ---------- */
+.today-card {
+  background: #fff; border-radius: 22px; padding: 20px; margin: 14px 0;
+  text-align: center; box-shadow: 0 6px 18px rgba(0,0,0,0.12);
+}
+.today-big { font-size: 26px; font-weight: bold; color: var(--primary-dark); }
+.today-sub { font-size: 16px; color: #6b5b8a; margin: 8px 0 14px; }
+.start-btn { width: 100%; box-shadow: 0 6px 0 var(--primary-dark); }
+
+.home-nav { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-top: 8px; }
+.nav-card {
+  border: none; background: #fff; border-radius: 20px; padding: 16px 8px; cursor: pointer;
+  display: flex; flex-direction: column; align-items: center; gap: 4px; font-family: inherit;
+  box-shadow: 0 5px 0 rgba(124,77,255,0.2), 0 6px 14px rgba(0,0,0,0.1);
+  font-weight: bold; color: var(--primary-dark); font-size: 15px;
+}
+.nav-card:active { transform: translateY(3px); box-shadow: 0 2px 0 rgba(124,77,255,0.2); }
+.nav-emoji { font-size: 38px; }
+.nav-sub { font-size: 11px; font-weight: normal; color: #9b8db5; }
+
+/* ---------- Step bar (daily lesson legs) ---------- */
+.step-bar { display: flex; gap: 6px; flex: 1; justify-content: center; }
+.step-seg { width: 30px; height: 10px; border-radius: 6px; background: #d6c7f0; }
+.step-seg.done { background: var(--good); }
+.step-seg.current { background: var(--primary); }
+.streak-big { font-size: 30px; font-weight: bold; color: #ef6c00; margin: 10px 0; }
+
+/* ---------- Trophy room ---------- */
+.stat-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin: 14px 0; }
+.stat-box { background: #fff; border-radius: 18px; padding: 14px 6px; text-align: center; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+.stat-num { font-size: 22px; font-weight: bold; color: var(--primary-dark); }
+.stat-label { font-size: 12px; color: #9b8db5; }
+.section-title { font-size: 20px; color: var(--primary-dark); margin: 18px 0 8px; }
+.badge-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+.badge { background: #ece6f5; border-radius: 18px; padding: 14px 6px; text-align: center; opacity: 0.6; }
+.badge.earned { background: #fff; opacity: 1; outline: 3px solid var(--accent); }
+.badge-emoji { font-size: 38px; }
+.badge-label { font-size: 12px; font-weight: bold; color: var(--primary-dark); }
+
+/* ---------- Settings ---------- */
+.mascot-picker { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; }
+.mascot-choice {
+  border: none; background: #fff; border-radius: 16px; padding: 10px 4px; cursor: pointer;
+  display: flex; flex-direction: column; align-items: center; gap: 4px; font-family: inherit;
+  font-size: 12px; font-weight: bold; color: var(--primary-dark); box-shadow: 0 3px 8px rgba(0,0,0,0.1);
+}
+.mascot-choice.on { outline: 3px solid var(--primary); }
+.mascot-choice-emoji { font-size: 34px; }
+.opt-row { display: flex; flex-wrap: wrap; gap: 10px; }
+.opt-btn {
+  flex: 1; min-width: 90px; border: none; background: #fff; border-radius: 16px; padding: 14px 10px;
+  cursor: pointer; font-family: inherit; font-weight: bold; color: var(--primary-dark); font-size: 16px;
+  box-shadow: 0 3px 8px rgba(0,0,0,0.1);
+}
+.opt-btn.on { outline: 3px solid var(--primary); background: #f3e9ff; }
+.opt-note { font-size: 11px; font-weight: normal; color: #9b8db5; margin-top: 2px; }
+
 .board-wrap { margin: 10px auto; max-width: 440px; }
 
 .lesson-buttons { display: flex; gap: 12px; margin-top: 14px; }

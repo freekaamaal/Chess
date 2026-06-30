@@ -3,6 +3,7 @@ import { Chess } from 'chess.js'
 import { chooseMove } from '../engine/ai.js'
 import { speak, sfx } from '../audio/speak.js'
 import { PLAYER_NAME } from '../config.js'
+import { getSettings, getMascot } from '../state/coach.js'
 import InteractiveBoard from './InteractiveBoard.jsx'
 import Mascot from './Mascot.jsx'
 
@@ -10,6 +11,8 @@ const START = 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1'
 
 export default function PlayGame({ onExit }) {
   const chessRef = useRef(new Chess())
+  const coach = getMascot()
+  const difficulty = getSettings().difficulty
   const [position, setPosition] = useState(START)
   const [message, setMessage] = useState(`Your turn, ${PLAYER_NAME}! You are the white pieces. Tap a piece to move it.`)
   const [over, setOver] = useState(false)
@@ -40,7 +43,7 @@ export default function PlayGame({ onExit }) {
         setMessage(`Checkmate! You win, ${PLAYER_NAME}! 🏆`)
         speak(`Checkmate! You win, ${PLAYER_NAME}! You are amazing!`)
       } else {
-        setMessage('Checkmate! Leo won this time — try again! 🦁')
+        setMessage(`Checkmate! ${coach.name} won this time — try again! ${coach.emoji}`)
         speak('Checkmate! I won this time. Let us play again!')
       }
       return true
@@ -58,7 +61,7 @@ export default function PlayGame({ onExit }) {
   }
 
   function computerMove() {
-    const move = chooseMove(chess)
+    const move = chooseMove(chess, difficulty)
     if (!move) {
       announceIfOver()
       busy.current = false
@@ -95,7 +98,7 @@ export default function PlayGame({ onExit }) {
     if (announceIfOver()) return true
     // Hand over to the computer after a short, friendly pause.
     busy.current = true
-    setMessage('Leo is thinking… 🦁')
+    setMessage(`${coach.name} is thinking… ${coach.emoji}`)
     setTimeout(computerMove, 650)
     return true
   }
@@ -106,7 +109,7 @@ export default function PlayGame({ onExit }) {
         <button className="back-btn" onClick={onExit} aria-label="Back">
           ⬅️
         </button>
-        <div className="play-title">Play vs Leo 🦁</div>
+        <div className="play-title">Play vs {coach.name} {coach.emoji}</div>
         <button className="icon-btn" onClick={newGame} aria-label="New game">
           🔄
         </button>

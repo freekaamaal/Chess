@@ -1,130 +1,122 @@
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import MeetThePieces from './components/MeetThePieces.jsx'
 import MoveGames from './components/MoveGames.jsx'
 import CaptureGames from './components/CaptureGames.jsx'
 import CheckmateGames from './components/CheckmateGames.jsx'
 import SpecialMoves from './components/SpecialMoves.jsx'
 import PlayGame from './components/PlayGame.jsx'
-import { loadProgress, saveStageComplete, totalStars } from './state/progress.js'
-import { speak, setVoiceEnabled, isVoiceEnabled, sfx } from './audio/speak.js'
-import { PLAYER_NAME } from './config.js'
+import CoachHome from './components/CoachHome.jsx'
+import DailyLesson from './components/DailyLesson.jsx'
+import TrophyRoom from './components/TrophyRoom.jsx'
+import Settings from './components/Settings.jsx'
+import TimeUp from './components/TimeUp.jsx'
+import { loadProgress, saveStageComplete } from './state/progress.js'
+import { addSeconds, secondsLeftToday, getSettings } from './state/coach.js'
+import { setVoiceEnabled, sfx } from './audio/speak.js'
 
-// The "world map" — a row of stages the child travels through. Stage 0 is
-// playable now; later stages are shown as locked/coming-soon so the path is
-// visible (and motivating) even before every stage is built.
-
+// The 6-level "Practice" curriculum (always available from the home screen).
 const STAGES = [
-  { id: 'meet', emoji: '🎭', title: 'Meet the Pieces', ready: true },
-  { id: 'move', emoji: '🕹️', title: 'How They Move', ready: true },
-  { id: 'capture', emoji: '⚔️', title: 'Capturing', ready: true },
-  { id: 'checkmate', emoji: '👑', title: 'Checkmate!', ready: true },
-  { id: 'special', emoji: '✨', title: 'Special Moves', ready: true },
-  { id: 'play', emoji: '♟️', title: 'Play a Game', ready: true },
+  { id: 'meet', emoji: '🎭', title: 'Meet the Pieces' },
+  { id: 'move', emoji: '🕹️', title: 'How They Move' },
+  { id: 'capture', emoji: '⚔️', title: 'Capturing' },
+  { id: 'checkmate', emoji: '👑', title: 'Checkmate!' },
+  { id: 'special', emoji: '✨', title: 'Special Moves' },
+  { id: 'play', emoji: '♟️', title: 'Play a Game' },
 ]
 
+// Screens that count toward the daily play-time budget.
+const ACTIVITY = new Set(['daily', 'meet', 'move', 'capture', 'checkmate', 'special', 'play'])
+
 export default function App() {
-  const [screen, setScreen] = useState('map')
+  const [screen, setScreen] = useState('home')
   const [progress, setProgress] = useState(loadProgress)
-  const [voiceOn, setVoiceOn] = useState(isVoiceEnabled())
+  const tick = useRef(null)
 
-  function toggleVoice() {
-    const on = !voiceOn
-    setVoiceOn(on)
-    setVoiceEnabled(on)
-    if (on) speak('Voice on!')
-  }
+  // Apply the saved voice preference once at startup.
+  useEffect(() => {
+    setVoiceEnabled(getSettings().voice !== false)
+  }, [])
 
-  function openStage(stage) {
-    if (!stage.ready) {
+  // Count practice time while in an activity; end the day when the budget runs out.
+  useEffect(() => {
+    if (!ACTIVITY.has(screen)) return
+    tick.current = setInterval(() => {
+      addSeconds(1)
+      if (secondsLeftToday() <= 0) {
+        clearInterval(tick.current)
+        setScreen('timeup')
+      }
+    }, 1000)
+    return () => clearInterval(tick.current)
+  }, [screen])
+
+  function openActivity(target) {
+    if (secondsLeftToday() <= 0) {
       sfx.tap()
-      speak('This adventure is coming soon!')
+      setScreen('timeup')
       return
     }
     sfx.tap()
-    setScreen(stage.id)
+    setScreen(target)
   }
 
-  if (screen === 'meet') {
+  function backHome() {
+    setProgress(loadProgress())
+    setScreen('home')
+  }
+
+  // --- Activity screens ---
+  if (screen === 'daily') return <DailyLesson onExit={backHome} onDone={() => setProgress(loadProgress())} />
+  if (screen === 'meet')
+    return <MeetThePieces onExit={backHome} onComplete={() => saveStageComplete('meet', 6)} />
+  if (screen === 'move')
+    return <MoveGames onExit={backHome} onComplete={() => saveStageComplete('move', 6)} />
+  if (screen === 'capture')
+    return <CaptureGames onExit={backHome} onComplete={() => saveStageComplete('capture', 6)} />
+  if (screen === 'checkmate')
+    return <CheckmateGames onExit={backHome} onComplete={() => saveStageComplete('checkmate', 5)} />
+  if (screen === 'special')
+    return <SpecialMoves onExit={backHome} onComplete={() => saveStageComplete('special', 3)} />
+  if (screen === 'play') return <PlayGame onExit={backHome} />
+
+  // --- Non-activity screens ---
+  if (screen === 'trophy') return <TrophyRoom onExit={backHome} />
+  if (screen === 'settings') return <Settings onExit={backHome} onChange={() => setProgress(loadProgress())} />
+  if (screen === 'timeup') return <TimeUp onExit={backHome} />
+
+  if (screen === 'practice') {
     return (
-      <MeetThePieces
-        onExit={() => setScreen('map')}
-        onComplete={() => setProgress(saveStageComplete('meet', 6))}
-      />
-    )
-  }
-
-  if (screen === 'move') {
-    return (
-      <MoveGames
-        onExit={() => setScreen('map')}
-        onComplete={() => setProgress(saveStageComplete('move', 6))}
-      />
-    )
-  }
-
-  if (screen === 'capture') {
-    return (
-      <CaptureGames
-        onExit={() => setScreen('map')}
-        onComplete={() => setProgress(saveStageComplete('capture', 6))}
-      />
-    )
-  }
-
-  if (screen === 'checkmate') {
-    return (
-      <CheckmateGames
-        onExit={() => setScreen('map')}
-        onComplete={() => setProgress(saveStageComplete('checkmate', 5))}
-      />
-    )
-  }
-
-  if (screen === 'special') {
-    return (
-      <SpecialMoves
-        onExit={() => setScreen('map')}
-        onComplete={() => setProgress(saveStageComplete('special', 3))}
-      />
-    )
-  }
-
-  if (screen === 'play') {
-    return <PlayGame onExit={() => setScreen('map')} />
-  }
-
-  return (
-    <div className="map">
-      <header className="map-header">
-        <h1>{PLAYER_NAME}'s Chess 🦁</h1>
-        <div className="header-right">
-          <span className="total-stars">⭐ {totalStars(progress)}</span>
-          <button className="icon-btn" onClick={toggleVoice} aria-label="Toggle voice">
-            {voiceOn ? '🔊' : '🔇'}
-          </button>
+      <div className="map">
+        <div className="lesson-top">
+          <button className="back-btn" onClick={backHome} aria-label="Back">⬅️</button>
+          <h1 style={{ margin: 0, fontSize: 26 }}>Practice 🗺️</h1>
+          <span style={{ width: 48 }} />
         </div>
-      </header>
-
-      <p className="tagline">Hi {PLAYER_NAME}! Tap an adventure to start! 👇</p>
-
-      <div className="stage-grid">
-        {STAGES.map((stage, i) => {
-          const done = progress.completed[stage.id]
-          return (
-            <button
-              key={stage.id}
-              className={`stage-card ${stage.ready ? '' : 'locked'} ${done ? 'done' : ''}`}
-              onClick={() => openStage(stage)}
-            >
-              <div className="stage-emoji">{stage.ready ? stage.emoji : '🔒'}</div>
-              <div className="stage-num">Level {i + 1}</div>
-              <div className="stage-title">{stage.title}</div>
-              {done && <div className="stage-stars">⭐⭐⭐</div>}
-              {!stage.ready && <div className="soon">Coming soon</div>}
-            </button>
-          )
-        })}
+        <p className="tagline">Tap a level to learn and play!</p>
+        <div className="stage-grid">
+          {STAGES.map((stage, i) => {
+            const done = progress.completed[stage.id]
+            return (
+              <button key={stage.id} className={`stage-card ${done ? 'done' : ''}`} onClick={() => openActivity(stage.id)}>
+                <div className="stage-emoji">{stage.emoji}</div>
+                <div className="stage-num">Level {i + 1}</div>
+                <div className="stage-title">{stage.title}</div>
+                {done && <div className="stage-stars">⭐⭐⭐</div>}
+              </button>
+            )
+          })}
+        </div>
       </div>
-    </div>
+    )
+  }
+
+  // --- Home (daily coach) ---
+  return (
+    <CoachHome
+      onStartLesson={() => openActivity('daily')}
+      onPractice={() => setScreen('practice')}
+      onTrophy={() => setScreen('trophy')}
+      onSettings={() => setScreen('settings')}
+    />
   )
 }

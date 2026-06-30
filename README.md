@@ -32,6 +32,23 @@ All six levels of the curriculum are now playable. Every level supports both
 **tapping** (tap a piece, then tap where to go — easiest for little fingers) and
 dragging. Levels 4–6 use the full `chess.js` rules engine.
 
+### The Daily Coach 🦁
+
+The app opens as a **daily coach**, not just a menu:
+
+- 🗓️ **Today's Lesson** — a short, fresh set of bite-size tactic puzzles each day
+  ("win the piece!" and "checkmate in one!"), shown as small steps so she's never
+  overwhelmed.
+- 🔥 **Streaks** — a day-streak that grows each day she practises (and resets if a
+  day is missed), to build the daily habit.
+- ⏰ **Daily time budget** — a gentle limit (default 15 min, configurable) that ends
+  with a friendly "see you tomorrow!" so sessions stay short and special.
+- 🏆 **Trophy Room** — streak, days played, stars, best streak, and unlockable
+  badges, so she can watch her progress grow.
+- ⚙️ **Settings** — pick the coach character (lion/puppy/unicorn/robot/cat), set
+  the coach's difficulty (easy/medium/hard), the daily time limit, and voice on/off.
+- 🗺️ **Practice** — the six levels, always available to revisit.
+
 ## Run it
 
 ```bash
