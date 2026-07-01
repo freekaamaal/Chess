@@ -22,15 +22,32 @@ const LEVELS = {
   openings: OpeningLesson,
 }
 
-// Runs TODAY's journey day: whatever activity the plan says for the child's
-// current day. Finishing it advances the streak and the journey by one day.
+// Puzzle difficulty grows as the journey goes on.
+function diffForDay(day) {
+  return Math.min(3, 1 + Math.floor((day - 1) / 10))
+}
+
+// Turn a day's single activity into a multi-part SESSION so each day has real
+// substance (and daily tactics practice, which is what builds skill):
+//   - a lesson day  → the lesson, then a bonus puzzle round
+//   - a game day    → a puzzle warm-up, then the game
+//   - a puzzle day  → the puzzles (already several)
+function buildSession(plan) {
+  const day = plan.day
+  const bonus = { kind: 'puzzles', filter: { level: diffForDay(day) }, count: 4, label: `Day ${day} Puzzles` }
+  if (plan.activity.kind === 'level') return [plan.activity, bonus]
+  if (plan.activity.kind === 'play') return [{ ...bonus, count: 3, label: `Warm-up` }, plan.activity]
+  return [plan.activity] // puzzle day
+}
+
 export default function DailyLesson({ onExit, onDone }) {
   const dayIndex = useRef(loadCoach().planDay).current
+  const [seg, setSeg] = useState(0)
   const [finished, setFinished] = useState(false)
   const [streak, setStreak] = useState(0)
   const recorded = useRef(false)
 
-  // Already finished the whole 20-day journey.
+  // Already finished the whole journey.
   if (dayIndex >= PLAN_LENGTH) {
     return (
       <div className="lesson celebrate">
@@ -44,6 +61,7 @@ export default function DailyLesson({ onExit, onDone }) {
   }
 
   const plan = PLAN[dayIndex]
+  const session = buildSession(plan)
 
   function markDone() {
     if (recorded.current) return
@@ -53,11 +71,16 @@ export default function DailyLesson({ onExit, onDone }) {
     onDone?.(s)
   }
 
-  function finishWithCelebration() {
-    markDone()
-    setFinished(true)
-    sfx.win()
-    speak(`Fantastic, ${PLAYER_NAME}! Day ${plan.day} done! See you tomorrow!`)
+  // Called when the current segment finishes.
+  function segmentDone() {
+    if (seg < session.length - 1) {
+      setSeg(seg + 1)
+    } else {
+      markDone()
+      setFinished(true)
+      sfx.win()
+      speak(`Fantastic, ${PLAYER_NAME}! Day ${plan.day} done! See you tomorrow!`)
+    }
   }
 
   if (finished) {
@@ -73,25 +96,24 @@ export default function DailyLesson({ onExit, onDone }) {
     )
   }
 
-  const { activity } = plan
+  const activity = session[seg]
 
   if (activity.kind === 'puzzles') {
     return (
       <PuzzlePlayer
-        puzzles={resolvePuzzles(activity, plan.day)}
-        title={`Day ${plan.day}`}
+        key={seg}
+        puzzles={resolvePuzzles(activity, plan.day * 100 + seg)}
+        title={activity.label || `Day ${plan.day}`}
         onExit={onExit}
-        onComplete={finishWithCelebration}
+        onComplete={segmentDone}
       />
     )
   }
 
   if (activity.kind === 'play') {
-    return <PlayGame onExit={onExit} onGameEnd={markDone} />
+    return <PlayGame key={seg} onExit={onExit} onGameEnd={segmentDone} />
   }
 
-  // activity.kind === 'level' — the level shows its own celebration; we just
-  // record the day when it reports completion.
   const LevelComponent = LEVELS[activity.level]
-  return <LevelComponent onExit={onExit} onComplete={markDone} />
+  return <LevelComponent key={seg} onExit={onExit} onComplete={segmentDone} />
 }

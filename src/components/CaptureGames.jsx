@@ -38,7 +38,7 @@ export default function CaptureGames({ onExit, onComplete }) {
     const styles = {}
     if (pieceSquare) {
       for (const s of captureSquares(lesson.id, pieceSquare)) {
-        styles[s] = { background: 'radial-gradient(circle, rgba(229,57,53,0.40) 28%, transparent 30%)' }
+        styles[s] = { backgroundImage: 'radial-gradient(circle, rgba(229,57,53,0.40) 28%, transparent 30%)' }
       }
       styles[pieceSquare] = { boxShadow: 'inset 0 0 0 4px #ffd54f' }
     }

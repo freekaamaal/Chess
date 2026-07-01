@@ -46,7 +46,7 @@ export default function MoveGames({ onExit, onComplete }) {
     if (pieceSquare) {
       for (const s of reachableSquares(lesson.id, pieceSquare)) {
         styles[s] = {
-          background: 'radial-gradient(circle, rgba(124,77,255,0.45) 28%, transparent 30%)',
+          backgroundImage: 'radial-gradient(circle, rgba(124,77,255,0.45) 28%, transparent 30%)',
         }
       }
       styles[pieceSquare] = { boxShadow: 'inset 0 0 0 4px #ffd54f' }

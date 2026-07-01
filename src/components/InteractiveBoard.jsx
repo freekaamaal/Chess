@@ -42,7 +42,7 @@ export default function InteractiveBoard({
     for (const t of legalTargets(selected)) {
       styles[t] = {
         ...(styles[t] || {}),
-        background: 'radial-gradient(circle, rgba(102,187,106,0.55) 28%, transparent 30%)',
+        backgroundImage: 'radial-gradient(circle, rgba(102,187,106,0.55) 28%, transparent 30%)',
       }
     }
   }

@@ -22,7 +22,7 @@ export default function MeetThePieces({ onExit, onComplete }) {
     const styles = {}
     for (const s of reachableSquares(piece.id, square)) {
       styles[s] = {
-        background: 'radial-gradient(circle, rgba(124,77,255,0.55) 30%, transparent 32%)',
+        backgroundImage: 'radial-gradient(circle, rgba(124,77,255,0.55) 30%, transparent 32%)',
         borderRadius: '50%',
       }
     }

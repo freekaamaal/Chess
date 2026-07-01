@@ -30,7 +30,7 @@ export default function OpeningLesson({ onExit, onComplete }) {
   useMemo(() => { if (current) speak(current.say) }, [step]) // eslint-disable-line react-hooks/exhaustive-deps
 
   const extraStyles = current
-    ? { [current.from]: { boxShadow: 'inset 0 0 0 4px #ffb300' }, [current.to]: { background: 'radial-gradient(circle, rgba(255,179,0,0.5) 30%, transparent 32%)' } }
+    ? { [current.from]: { boxShadow: 'inset 0 0 0 4px #ffb300' }, [current.to]: { backgroundImage: 'radial-gradient(circle, rgba(255,179,0,0.5) 30%, transparent 32%)' } }
     : {}
 
   function legalTargets(square) {
