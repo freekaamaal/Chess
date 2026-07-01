@@ -48,10 +48,16 @@ dragging. Levels 4–6 use the full `chess.js` rules engine.
 
 ### Tactics Trainer & adaptive difficulty 🎯
 
-- A **bank of 60+ puzzles** in `src/lessons/tacticsData.js`, auto-generated and
-  **verified by chess.js** via `scripts/genTactics.mjs` (re-run it to grow the
-  bank). Themes: win-a-piece, win-a-rook, win-the-queen, checkmate-in-one,
-  two-rook mates, and **knight forks**, each tagged with a 1–3 difficulty level.
+- A **bank of ~68 puzzles**: hand-crafted real-game patterns in
+  `src/lessons/curatedTactics.js` (Scholar's mate, back-rank mate, a royal fork,
+  and **defense puzzles** — "save your attacked piece"), plus ~61 auto-generated
+  puzzles in `src/lessons/tacticsData.js`. The generator now places a **game-like
+  backdrop of pieces** (avg ~12 pieces/board, not empty boards) and every puzzle
+  is **verified by chess.js**. Themes: win-a-piece/rook/queen, checkmate-in-one,
+  two-rook mate, knight fork, and defense — each tagged level 1–3.
+- **Openings lesson** (in the journey on Day 8, and under Practice): a guided
+  walk-through of the 4 golden opening rules — control the center, develop
+  knights, develop bishops, castle — played move-by-move on a real board.
 - **Tactics Trainer** (under Practice): endless rounds of 5 puzzles chosen near
   the child's tactics rating. The rating rises on first-try solves and eases off
   when she struggles, so the puzzles get **harder as she improves** (shown as
@@ -63,7 +69,8 @@ dragging. Levels 4–6 use the full `chess.js` rules engine.
 ### Regenerating the puzzle bank
 
 ```bash
-node scripts/genTactics.mjs   # writes src/lessons/tacticsData.js (all verified)
+node scripts/genTactics.mjs      # writes src/lessons/tacticsData.js (all verified)
+node scripts/validateTactics.mjs # re-checks curated + generated puzzles with chess.js
 ```
 
 ### The Daily Coach 🦁

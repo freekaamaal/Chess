@@ -19,7 +19,7 @@ export const PLAN = [
   { day: 7, title: 'Special Moves', focus: 'Castle, promote, en passant', activity: { kind: 'level', level: 'special' } },
 
   // --- Week 2: Tactics & first games ---
-  { day: 8, title: 'Win a Rook', focus: 'Bigger captures', activity: { kind: 'puzzles', filter: { theme: 'Win a Rook' }, count: 4 } },
+  { day: 8, title: 'Opening Rules', focus: 'Start every game smart', activity: { kind: 'level', level: 'openings' } },
   { day: 9, title: 'Your First Game!', focus: 'Play vs Leo', activity: { kind: 'play', difficulty: 'easy' } },
   { day: 10, title: 'Win the Piece Again', focus: 'Captures', activity: { kind: 'puzzles', filter: { level: 1 }, count: 4 } },
   { day: 11, title: 'Checkmate in One', focus: 'Finish the King', activity: { kind: 'puzzles', filter: { theme: 'Checkmate' }, count: 4 } },
@@ -29,7 +29,7 @@ export const PLAN = [
 
   // --- Week 3: Play & mastery ---
   { day: 15, title: 'Level Up!', focus: 'Play vs a tougher Leo', activity: { kind: 'play', difficulty: 'medium' } },
-  { day: 16, title: 'Tactics Review', focus: 'Mixed captures', activity: { kind: 'puzzles', filter: { level: 2 }, count: 5 } },
+  { day: 16, title: 'Defense!', focus: 'Save your attacked pieces', activity: { kind: 'puzzles', filter: { theme: 'Defense' }, count: 4 } },
   { day: 17, title: 'Checkmate Mastery', focus: 'All the mates', activity: { kind: 'puzzles', filter: { theme: 'Checkmate' }, count: 5 } },
   { day: 18, title: 'Play a Game', focus: 'Medium Leo', activity: { kind: 'play', difficulty: 'medium' } },
   { day: 19, title: 'Knight Forks!', focus: 'The fork trick', activity: { kind: 'puzzles', filter: { theme: 'Knight Fork' }, count: 4 } },

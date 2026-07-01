@@ -41,8 +41,16 @@ export default function PuzzlePlayer({ puzzles, title = 'Puzzle', onExit, onComp
 
   function solved(move) {
     if (puzzle.type === 'mate') return chess.isCheckmate()
-    if (puzzle.type === 'capture') return !!move.captured
+    if (puzzle.type === 'capture') return move.from === puzzle.from && move.to === puzzle.to
     if (puzzle.type === 'solution') return move.from === puzzle.from && move.to === puzzle.to
+    if (puzzle.type === 'save') {
+      // The threatened piece (originally on puzzle.from) must now be safe: either
+      // she moved it to an unattacked square, or she captured the attacker.
+      const pieceSq = move.from === puzzle.from ? move.to : puzzle.from
+      const stillThere = !!chess.get(pieceSq)
+      const canBeTaken = chess.moves({ verbose: true }).some((m) => m.to === pieceSq)
+      return stillThere && !canBeTaken
+    }
     return false
   }
 
@@ -98,10 +106,10 @@ export default function PuzzlePlayer({ puzzles, title = 'Puzzle', onExit, onComp
 
       <Mascot speaking message={puzzle.hint} />
 
-      <div className="piece-card" style={{ '--piece-color': puzzle.type === 'mate' ? '#ab47bc' : '#ef6c00' }}>
-        <div className="piece-emoji">{puzzle.type === 'mate' ? '👑' : '🎯'}</div>
+      <div className="piece-card" style={{ '--piece-color': puzzle.type === 'mate' ? '#ab47bc' : puzzle.type === 'save' ? '#0288d1' : '#ef6c00' }}>
+        <div className="piece-emoji">{puzzle.type === 'mate' ? '👑' : puzzle.type === 'save' ? '🛡️' : puzzle.type === 'solution' ? '🐴' : '🎯'}</div>
         <div className="piece-name">{title} {index + 1}</div>
-        <div className="piece-title">{puzzle.type === 'mate' ? 'Checkmate in one!' : 'Win the piece!'}</div>
+        <div className="piece-title">{puzzle.theme || 'Puzzle'}</div>
       </div>
 
       <div className="board-wrap">

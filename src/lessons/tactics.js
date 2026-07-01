@@ -1,8 +1,10 @@
-// The tactic puzzle bank lives in tacticsData.js (auto-generated & verified by
-// scripts/genTactics.mjs). This module re-exports it and provides pickers.
-import { TACTICS } from './tacticsData.js'
+// The tactic puzzle bank = curated real-game puzzles (curatedTactics.js) +
+// auto-generated verified puzzles (tacticsData.js). This module merges them and
+// provides pickers. All puzzles are verified by scripts/validateTactics.mjs.
+import { GENERATED_TACTICS } from './tacticsData.js'
+import { CURATED_TACTICS } from './curatedTactics.js'
 
-export { TACTICS }
+export const TACTICS = [...CURATED_TACTICS, ...GENERATED_TACTICS]
 
 // Deterministic shuffle so a given seed always yields the same order.
 function seededShuffle(arr, seed) {

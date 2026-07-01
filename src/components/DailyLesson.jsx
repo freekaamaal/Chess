@@ -9,6 +9,7 @@ import MoveGames from './MoveGames.jsx'
 import CaptureGames from './CaptureGames.jsx'
 import CheckmateGames from './CheckmateGames.jsx'
 import SpecialMoves from './SpecialMoves.jsx'
+import OpeningLesson from './OpeningLesson.jsx'
 import PlayGame from './PlayGame.jsx'
 import Mascot from './Mascot.jsx'
 
@@ -18,6 +19,7 @@ const LEVELS = {
   capture: CaptureGames,
   checkmate: CheckmateGames,
   special: SpecialMoves,
+  openings: OpeningLesson,
 }
 
 // Runs TODAY's journey day: whatever activity the plan says for the child's

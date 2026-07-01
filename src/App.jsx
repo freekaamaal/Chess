@@ -4,6 +4,7 @@ import MoveGames from './components/MoveGames.jsx'
 import CaptureGames from './components/CaptureGames.jsx'
 import CheckmateGames from './components/CheckmateGames.jsx'
 import SpecialMoves from './components/SpecialMoves.jsx'
+import OpeningLesson from './components/OpeningLesson.jsx'
 import PlayGame from './components/PlayGame.jsx'
 import CoachHome from './components/CoachHome.jsx'
 import DailyLesson from './components/DailyLesson.jsx'
@@ -24,10 +25,11 @@ const STAGES = [
   { id: 'capture', emoji: '⚔️', title: 'Capturing' },
   { id: 'checkmate', emoji: '👑', title: 'Checkmate!' },
   { id: 'special', emoji: '✨', title: 'Special Moves' },
+  { id: 'openings', emoji: '📖', title: 'Opening Rules' },
   { id: 'play', emoji: '♟️', title: 'Play a Game' },
 ]
 
-const ACTIVITY = new Set(['daily', 'meet', 'move', 'capture', 'checkmate', 'special', 'play', 'tactics'])
+const ACTIVITY = new Set(['daily', 'meet', 'move', 'capture', 'checkmate', 'special', 'openings', 'play', 'tactics'])
 
 export default function App() {
   const [profile, setProfile] = useState(getActiveProfile)
@@ -82,6 +84,7 @@ export default function App() {
   if (screen === 'capture') return <CaptureGames onExit={backHome} onComplete={() => saveStageComplete('capture', 6)} />
   if (screen === 'checkmate') return <CheckmateGames onExit={backHome} onComplete={() => saveStageComplete('checkmate', 5)} />
   if (screen === 'special') return <SpecialMoves onExit={backHome} onComplete={() => saveStageComplete('special', 3)} />
+  if (screen === 'openings') return <OpeningLesson onExit={backHome} onComplete={() => saveStageComplete('openings', 4)} />
   if (screen === 'play') return <PlayGame onExit={backHome} />
   if (screen === 'tactics') return <TacticsTrainer onExit={backHome} />
 
